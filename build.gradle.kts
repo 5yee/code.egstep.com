@@ -6,7 +6,7 @@ plugins {
 	id("org.springframework.boot") version springBootVersion
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	kotlin("jvm") version kotlinVersion
-	kotlin("plugin.spring") version kotlinVersion
+	kotlin("plugin.spring") version kotlinVersion //bootJar 제공해중
 }
 
 group = "com.egstep"

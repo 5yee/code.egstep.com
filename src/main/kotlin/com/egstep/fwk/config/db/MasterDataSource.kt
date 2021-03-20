@@ -22,27 +22,33 @@ import org.springframework.transaction.PlatformTransactionManager
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
-@Configuration
+@Configuration // spring 읽어주세요~
 @EnableJpaRepositories(basePackages = ["com.egstep.code.repo.jpa"],
     entityManagerFactoryRef = "entityManagerFactory",
     transactionManagerRef = "primaryTransactionManager")
-class MasterDataSource {
+class MasterDataSource { // DB 접근법 퍼시스턴스 프레임워크 중(JPA)를 써서 사용함
     companion object {
         private val log = LoggerFactory.getLogger(MasterDataSource::class.java) as Logger
     }
 
     @Bean(name = ["dsMaster"])
-    fun dsMaster(
+    fun dsMaster( // 이름 지어준거임
         @Value("\${db.jpa.master.url}") url: String,
         @Value("\${db.common.minIdle}") minIdle: Int,
         @Value("\${db.common.maxPoolSize}") maxPoolSize: Int,
         @Value("\${db.common.idleTimeout}") idleTimeout: Long,
         @Value("\${db.master.userName}") userName: String,
-        @Value("\${db.master.password}") password: String
+        @Value("\${db.master.password}") password: String // application.yml파일에 없어여 (application-secret에 추가)
+        // git에 올라가면 안 돼서 따로 만들고 .gitIgnore에 올림
+        // 스프링에 처음 올릴때는 application.yml 파일만 읽어요
+        // Profile을 읽도록 하려고 Configuration에 proofile로 넣어주는거임
+        // application.secret or prd 환경마다 application 세팅을 다르게 할 수 있음
+        // 데이터 소스를 통해 DB에 접근하는 방법은 엄청 많다.
+        //
     ): DataSource {
         log.info("=============== JPA Primary DataSource Setting Start =============== ")
 
-        val ds = HikariDataSource()
+        val ds = HikariDataSource() // db 접근 통로를 데이터소스라고 함
         ds.jdbcUrl = url
         ds.username = userName
         ds.password = password
@@ -90,7 +96,7 @@ class MasterDataSource {
         return em
     }
 
-    @Bean(name=["primaryTransactionManager"])
+    @Bean(name=["primaryTransactionManager"]) // 트랜젝션 관리 매니저 만들어준거임
     @Order(Ordered.LOWEST_PRECEDENCE)
     fun transactionManager(@Qualifier("entityManagerFactory") entityManagerFactory: EntityManagerFactory,
                            @Qualifier("dsMaster") dataSource: DataSource
